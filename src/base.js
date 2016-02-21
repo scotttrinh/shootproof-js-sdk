@@ -1,3 +1,0 @@
-function makeApiRequest(params, photos) {
-
-}
