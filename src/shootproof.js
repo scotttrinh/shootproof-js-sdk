@@ -6,6 +6,7 @@ import * as photo from './photo';
 import * as order from './order';
 import * as mobileApp from './mobile-app';
 import * as brand from './brand';
+import * as contact from './contact';
 
 export {
   studio,
@@ -15,4 +16,5 @@ export {
   order,
   mobileApp,
   brand,
+  contact,
 };
