@@ -5,6 +5,7 @@ import * as album from './album';
 import * as photo from './photo';
 import * as order from './order';
 import * as mobileApp from './mobile-app';
+import * as brand from './brand';
 
 export {
   studio,
@@ -13,4 +14,5 @@ export {
   photo,
   order,
   mobileApp,
+  brand,
 };
