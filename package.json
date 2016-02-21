@@ -16,8 +16,7 @@
     "lodash-es": "^4.5.0",
     "rollup": "^0.25.3",
     "rollup-plugin-babel": "^2.3.9",
-    "source-map-support": "^0.4.0",
-    "webpack": "^1.12.13"
+    "source-map-support": "^0.4.0"
   },
   "dependencies": {
     "querystring": "^0.2.0",
