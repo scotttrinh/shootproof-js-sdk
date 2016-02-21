@@ -4,8 +4,12 @@ function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'defau
 
 var isEmpty = _interopDefault(require('lodash-es/isEmpty'));
 var isUndefined = _interopDefault(require('lodash-es/isUndefined'));
-var queryString = _interopDefault(require('query-string'));
+var isArray = _interopDefault(require('lodash-es/isArray'));
+var isObject = _interopDefault(require('lodash-es/isObject'));
+var map = _interopDefault(require('lodash-es/map'));
 var merge = _interopDefault(require('lodash-es/merge'));
+var queryString = _interopDefault(require('query-string'));
+var reduce = _interopDefault(require('lodash-es/reduce'));
 var lodashEs_forEach = require('lodash-es/forEach');
 
 (function (self) {
@@ -666,6 +670,415 @@ var event = Object.freeze({
   getEventPhotos: getEventPhotos
 });
 
+/**
+ * Method to return the albums for an event
+ *
+ * @param eventId Number Event ID
+ * @return Promise Fetch response
+ */
+function getEventAlbums(eventId) {
+  if (isUndefined(eventId)) {
+    throw new Error('The eventId is required to check if a photo exists.');
+  }
+  return makeApiRequest({
+    method: 'sp.album.get_list',
+    event_id: eventId
+  });
+}
+
+/**
+ * Method to get the photos for an album
+ *
+ * @param albumId Number Album ID
+ * @param page Number Page number
+ * @return Promise Fetch response
+ */
+function getAlbumPhotos(albumId) {
+  var page = arguments.length <= 1 || arguments[1] === undefined ? 1 : arguments[1];
+
+  if (isUndefined(albumId)) {
+    throw new Error('The eventId is required to check if a photo exists.');
+  }
+  return makeApiRequest({
+    method: 'sp.album.get_photos',
+    album_id: albumId,
+    page: page
+  });
+}
+
+/**
+ * Method to create a new album in an event
+ *
+ * @param eventId Number Event ID
+ * @param albumName String Album name
+ * @param password String (optional) Password
+ * @param parentAlbumId Number (optional) Parent album ID
+ * @return Promise Fetch response
+ */
+function createEventAlbum(eventId, albumName, password, parentAlbumId) {
+  if (isUndefined(eventId)) {
+    throw new Error('The eventId is required to create an album.');
+  }
+  if (isUndefined(albumName)) {
+    throw new Error('The albumName is required to create a new album.');
+  }
+  return makeApiRequest({
+    method: 'sp.album.create',
+    event_id: eventId,
+    album_name: albumName,
+    password: password,
+    parent_id: parentAlbumId
+  });
+}
+
+/**
+ * Method to create a move album within an event
+ *
+ * @param albumId Number Album ID
+ * @param parentAlbumId Number (optional) Parent album ID
+ * @return Promise Fetch response
+ */
+function moveEventAlbum(albumId, parentAlbumId) {
+  if (isUndefined(albumId)) {
+    throw new Error('The albumId is required to move an album.');
+  }
+  return makeApiRequest({
+    method: 'sp.album.move',
+    album_id: albumId,
+    parent_id: parentAlbumId
+  });
+}
+
+/**
+ * Method to rename an album
+ *
+ * @param albumId Number Album ID
+ * @param albumName String Album name
+ * @return Promise Fetch response
+ */
+function renameEventAlbum(albumId, albumName) {
+  if (isUndefined(albumId)) {
+    throw new Error('The albumId is required to rename an album.');
+  }
+  if (isUndefined(albumName)) {
+    throw new Error('The albumName is required to create a new album.');
+  }
+  return makeApiRequest({
+    method: 'sp.album.rename',
+    album_id: albumId,
+    album_name: albumName
+  });
+}
+
+/**
+ * Method to delete an album
+ *
+ * @param albumId Number Album ID
+ * @return Promise Fetch response
+ */
+function deleteEventAlbum(albumId) {
+  if (isUndefined(albumId)) {
+    throw new Error('The albumId is required to delete an album.');
+  }
+  return makeApiRequest({
+    method: 'sp.album.delete',
+    album_id: albumId
+  });
+}
+
+
+
+var album = Object.freeze({
+  getEventAlbums: getEventAlbums,
+  getAlbumPhotos: getAlbumPhotos,
+  createEventAlbum: createEventAlbum,
+  moveEventAlbum: moveEventAlbum,
+  renameEventAlbum: renameEventAlbum,
+  deleteEventAlbum: deleteEventAlbum
+});
+
+/**
+ * Method to delete a photo from an event
+ *
+ * @param photoId Number Photo ID
+ * @return Promise Fetch response
+ */
+function deletePhoto(photoId) {
+  if (isUndefined(photoId)) {
+    throw new Error('The photoId is required to delete a photo.');
+  }
+  return makeApiRequest({
+    method: 'sp.photo.delete',
+    photo_id: photoId
+  });
+}
+
+
+
+var photo = Object.freeze({
+  deletePhoto: deletePhoto
+});
+
+/**
+* Method to get the list of orders for a studio
+*
+* @param page Number Page number
+* @return Promise Fetch response
+*/
+function getOrderList() {
+  var page = arguments.length <= 0 || arguments[0] === undefined ? 1 : arguments[0];
+
+  return makeApiRequest({
+    method: 'sp.order.get_list',
+    page: page
+  });
+}
+
+/**
+ * Method to get the details for an order
+ *
+ * @param orderId Number Order ID
+ * @return Promise Fetch response
+ */
+function getOrderDetails(orderId) {
+  if (isUndefined(orderId)) {
+    throw new Error('The orderId is required to get the details or an order.');
+  }
+  return makeApiRequest({
+    method: 'sp.order.get_details',
+    order_id: orderId
+  });
+}
+
+
+
+var order = Object.freeze({
+  getOrderList: getOrderList,
+  getOrderDetails: getOrderDetails
+});
+
+/**
+* Method to return all active mobile apps for a studio or brand.
+*
+* If no brand ID is provided, all mobile apps for the studio will be
+* returned.  If a brand ID is provided, then only mobile apps within
+* that brand will be returned.
+*
+* @param brandId Number (optional) Brand ID for lookup
+* @param page Number Page number
+* @return Promise Fetch response
+*/
+function getMobileApps(brandId) {
+  var page = arguments.length <= 1 || arguments[1] === undefined ? 1 : arguments[1];
+
+  var params = {
+    method: 'sp.mobile_app.get_list',
+    page: page
+  };
+  if (!isUndefined(brandId) && brandId !== '') {
+    params.brand_id = brandId;
+  }
+  return makeApiRequest(params);
+}
+
+/**
+ * Method to get the photos for a mobile app.
+ *
+ * @param mobileAppId Number Mobile app ID
+ * @return Promise Fetch response
+ */
+function getMobileAppPhotos(mobileAppId) {
+  return makeApiRequest({
+    method: 'sp.mobile_app.get_photos',
+    mobile_app_id: mobileAppId
+  });
+}
+
+
+
+var mobileApp = Object.freeze({
+  getMobileApps: getMobileApps,
+  getMobileAppPhotos: getMobileAppPhotos
+});
+
+/**
+ * Method to return all active brands for a studio.
+ *
+ * @return Promise Fetch response
+ */
+function getBrands() {
+  return makeApiRequest({
+    method: 'sp.brand.get_list'
+  });
+}
+
+/**
+ * Method to return data on a single brand.
+ *
+ * @param brandId Number Brand ID to retrieve for.
+ * @return Promise Fetch response
+ */
+function getBrandInfo(brandId) {
+  if (isUndefined(brandId)) {
+    throw new Error('You must supply a brand ID to retrieve it\'s info.');
+  }
+  return makeApiRequest({
+    method: 'sp.brand.info',
+    brand_id: brandId
+  });
+}
+
+
+
+var brand = Object.freeze({
+  getBrands: getBrands,
+  getBrandInfo: getBrandInfo
+});
+
+/* eslint-disable no-param-reassign */
+
+function flatten(prefix, obj) {
+  return reduce(function (acc, val, key) {
+    if (isObject(val)) {
+      flatten(key, val);
+    } else {
+      acc[isUndefined(prefix) ? key : prefix + '[' + key + ']'] = val;
+    }
+    return acc;
+  }, {}, obj);
+}
+
+/**
+ * Method to return data on a single contact.
+ *
+ * @param contactId Number Contact ID to retrieve for.
+ * @return Promise Fetch response
+ */
+function getContactInfo(contactId) {
+  if (isUndefined(contactId)) {
+    throw new Error('You must supply the ID for the contact.');
+  }
+  return makeApiRequest({
+    method: 'sp.contact.info',
+    contact_id: contactId
+  });
+}
+
+/**
+ * Method to create a new contact.
+ *
+ * Supported key-value pairs:
+ *
+ *     brand_id
+ *     first_name (required)
+ *     last_name
+ *     email (required)
+ *     phone
+ *     business_name
+ *     notes
+ *     tags (string of tags, separated by commas)
+ *     address (object)
+ *         address_1
+ *         address_2
+ *         city
+ *         state
+ *         state_other
+ *         country (required if address is provided)
+ *         zip_postal
+ *
+ * @param contactData Object Object containing contact info
+ * @return Promise Fetch response
+ */
+function createContact(contactData) {
+  var params = merge({ method: 'sp.contact.create' }, flatten(contactData));
+  return makeApiRequest(params);
+}
+
+/**
+ * Method to update an existing contact.
+ *
+ * Supported key-value pairs:
+ *
+ *     brand_id
+ *     first_name (required)
+ *     last_name
+ *     email (required)
+ *     phone
+ *     business_name
+ *     notes
+ *     tags (string of tags, separated by commas)
+ *     address (object. set null to remove)
+ *         address_1
+ *         address_2
+ *         city
+ *         state
+ *         state_other
+ *         country (required if address is provided)
+ *         zip_postal
+ *
+ * @param contactId Number Contact ID
+ * @param contactData Object Object of contact data.
+ * @return Promise Fetch response
+ */
+function updateContact(contactId, contactData) {
+  var params = merge({
+    method: 'sp.contact.create',
+    contact_id: contactId
+  }, flatten(contactData));
+  return makeApiRequest(params);
+}
+
+/**
+ * Method to create a multiple contacts in bulk.
+ *
+ * Must be an Array of Objects.  The same key-value pairs
+ * in `createContact` are supported in the inner objects.
+ *
+ * @param contacts Array Array of contact objects
+ * @return Promise Fetch response
+ */
+function bulkCreateContacts(contacts) {
+  if (isUndefined(contacts) || !isArray(contacts) || contacts.length === 0 || !isObject(contacts[1])) {
+    throw new Error('Must supply an array of contact objects');
+  }
+  return makeApiRequest({
+    method: 'sp.contact.bulk_create',
+    contacts: map(contacts, flatten)
+  });
+}
+
+/**
+ * Method to delete a contact.
+ *
+ * @param contactId Number Contact ID
+ * @return Promise Fetch response
+ */
+function deleteContact(contactId) {
+  if (isUndefined(contactId)) {
+    throw new Error('The contactId is required to delete a contact.');
+  }
+  return makeApiRequest({
+    method: 'sp.contact.delete',
+    contact_id: contactId
+  });
+}
+
+
+
+var contact = Object.freeze({
+  getContactInfo: getContactInfo,
+  createContact: createContact,
+  updateContact: updateContact,
+  bulkCreateContacts: bulkCreateContacts,
+  deleteContact: deleteContact
+});
+
 exports.studio = studio;
 exports.event = event;
+exports.album = album;
+exports.photo = photo;
+exports.order = order;
+exports.mobileApp = mobileApp;
+exports.brand = brand;
+exports.contact = contact;
 //# sourceMappingURL=shootproof.js.map
