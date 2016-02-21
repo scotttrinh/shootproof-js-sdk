@@ -4,6 +4,7 @@ import * as event from './event';
 import * as album from './album';
 import * as photo from './photo';
 import * as order from './order';
+import * as mobileApp from './mobile-app';
 
 export {
   studio,
@@ -11,4 +12,5 @@ export {
   album,
   photo,
   order,
+  mobileApp,
 };
