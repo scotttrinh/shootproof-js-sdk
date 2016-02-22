@@ -1,4 +1,4 @@
-import queryString from 'query-string';
+import * as queryString from 'query-string';
 import merge from 'lodash-es/merge';
 import isEmpty from 'lodash-es/isEmpty';
 import { checkStatus, objectToFormData } from './utils';

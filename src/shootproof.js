@@ -1,4 +1,4 @@
-import '../node_modules/whatwg-fetch/fetch';
+import 'whatwg-fetch/fetch';
 import * as auth from './auth';
 import * as studio from './studio';
 import * as event from './event';

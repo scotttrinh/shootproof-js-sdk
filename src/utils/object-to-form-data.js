@@ -1,4 +1,4 @@
-import { forEach } from 'lodash-es/forEach';
+import forEach from '../../node_modules/lodash-es/forEach';
 /**
  * Convert a plain JavaScript object into FormData
  *
