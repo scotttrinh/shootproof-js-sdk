@@ -1,4 +1,5 @@
 import '../node_modules/whatwg-fetch/fetch';
+import * as auth from './auth';
 import * as studio from './studio';
 import * as event from './event';
 import * as album from './album';
@@ -9,6 +10,7 @@ import * as brand from './brand';
 import * as contact from './contact';
 
 export {
+  auth,
   studio,
   event,
   album,
