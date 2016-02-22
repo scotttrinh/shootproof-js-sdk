@@ -1,3 +1,5 @@
+'use strict';
+
 function __commonjs(fn, module) { return module = { exports: {} }, fn(module, module.exports), module.exports; }
 
 
@@ -4779,5 +4781,13 @@ var contact = Object.freeze({
   deleteContact: deleteContact
 });
 
-export { auth, studio, event, album, photo, order, mobileApp, brand, contact };
-//# sourceMappingURL=shootproof.es.js.map
+exports.auth = auth;
+exports.studio = studio;
+exports.event = event;
+exports.album = album;
+exports.photo = photo;
+exports.order = order;
+exports.mobileApp = mobileApp;
+exports.brand = brand;
+exports.contact = contact;
+//# sourceMappingURL=shootproof.cjs.js.map
