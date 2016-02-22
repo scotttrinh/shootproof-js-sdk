@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>ShootProof JavaScript SDK Example</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+  </head>
+  <body>
+    <div class="container">
+      <button class="btn btn-primary" id="btn-authorize">Authorize</button>
+      <div class="alert alert-danger"></div>
+      <dl class="well">
+        <dt>Access Token</dt>
+        <dd id="access-token"></dd>
+        <dt>Refresh Token</dt>
+        <dd id="refresh-token"></dd>
+      </dl>
+    </div>
+    <script src="../dist/shootproof.js"></script>
+    <script>
+(function() {
+  var authorizeButton = document.getElementById('btn-authorize');
+  var aToken = document.getElementById('access-token');
+  var rToken = document.getElementById('refresh-token');
+  var errorAlert = document.getElementsByClassName('alert')[0];
+  var tokenWell = document.getElementsByClassName('well')[0];
+  shootproof.auth.init('7a4b7d07c45be00ed1a6f7a957d380b3', 'http://localhost:8080/example/index.html', 'sp.studio.info');
+  authorizeButton.onclick = handleClickAuthorize;
+  errorAlert.style.display = 'none';
+  tokenWell.style.display = 'none';
+
+  if (window.location.search.indexOf('code') !== -1) {
+    var search = window.location.search.substr(1).split('=');
+    shootproof.auth.requestAccessToken(search[1])
+      .then(function(json) {
+        aToken.innerHTML = json.access_token;
+        rToken.innerHTML = json.refresh_token;
+        tokenWell.style.display = 'block';
+      })
+      .catch(function(err) {
+        console.error(err);
+        errorAlert.innerHTML = err;
+        errorAlert.style.display = 'block';
+      });
+  }
+
+  function handleClickAuthorize() {
+    window.location = shootproof.auth.getLoginUri();
+  }
+})();
+    </script>
+  </body>
+</html>
