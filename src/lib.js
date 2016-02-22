@@ -57,7 +57,7 @@ function makeApiRequest(params = {}, photos = {}) {
  * @return String The URL for the given parameters
  */
 function getUri(path = '', params = {}) {
-  return path + queryString.stringify(params);
+  return `${path}?${queryString.stringify(params)}`;
 }
 
 export {
